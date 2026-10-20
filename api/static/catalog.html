@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Catálogo · VerdES somos</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container barra-top">
+      <a href="/" class="logo">
+        <img src="/static/logo_verdES.png" alt="Logo VerdES somos">
+        <span>VerdES somos</span>
+      </a>
+      <nav>
+        <a href="/">Inicio</a>
+        <a href="/static/catalog.html">Catálogo</a>
+        <a href="/static/identify.html">Identificar</a>
+        <a href="/#manual">Cómo usarlo</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero hero-corto">
+    <img class="adorno adorno-izq" src="/static/decor/marco_hojas.svg" alt="">
+    <img class="adorno adorno-der" src="/static/decor/colinas.svg" alt="">
+    <div class="container hero-content">
+      <h1>Catálogo</h1>
+      <p class="lead">Busca por nombre o filtra entre nativas e invasoras. Cada tarjeta abre la ficha.</p>
+    </div>
+  </section>
+
+  <main>
+    <div class="barra">
+      <input id="q" placeholder="Buscar por nombre común o científico">
+      <button data-status="" class="activo">Todas</button>
+      <button data-status="nativa">Nativas</button>
+      <button data-status="invasiva">Invasivas</button>
+      <button data-status="desconocido">Sin clasificar</button>
+    </div>
+    <div id="lista" class="grid"></div>
+  </main>
+
+  <img class="adorno cortina" src="/static/decor/cortina_flores.svg" alt="">
+
+  <footer class="footer">
+    <div class="container">
+      <p>VerdES somos — Flora de El Salvador</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+  <script>
+    const lista = document.getElementById("lista");
+    const q = document.getElementById("q");
+    let status = "";
+    async function cargar() {
+      const plantas = await pedir("/api/plantas?q=" + encodeURIComponent(q.value) + "&status=" + encodeURIComponent(status));
+      lista.innerHTML = plantas.length ? plantas.map(tarjeta).join("") : "<p>No hay plantas con ese filtro.</p>";
+    }
+    q.addEventListener("input", cargar);
+    document.querySelectorAll(".barra button").forEach((b) => {
+      b.onclick = () => {
+        document.querySelectorAll(".barra button").forEach((x) => x.classList.remove("activo"));
+        b.classList.add("activo");
+        status = b.dataset.status;
+        cargar();
+      };
+    });
+    cargar();
+  </script>
+</body>
+</html>

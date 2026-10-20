@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ficha · VerdES somos</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="container barra-top">
+      <a href="/" class="logo">
+        <img src="/static/logo_verdES.png" alt="Logo VerdES somos">
+        <span>VerdES somos</span>
+      </a>
+      <nav>
+        <a href="/">Inicio</a>
+        <a href="/static/catalog.html">Catálogo</a>
+        <a href="/static/identify.html">Identificar</a>
+        <a href="/#manual">Cómo usarlo</a>
+      </nav>
+    </div>
+  </header>
+
+  <section class="hero hero-corto">
+    <img class="adorno adorno-izq" src="/static/decor/marco_hojas.svg" alt="">
+    <img class="adorno adorno-der" src="/static/decor/colinas.svg" alt="">
+    <div class="container hero-content">
+      <h1>Ficha</h1>
+      <p class="lead"><a href="/static/catalog.html">Volver al catálogo</a></p>
+    </div>
+  </section>
+
+  <main id="ficha" class="ficha-pagina"><p>Cargando...</p></main>
+
+  <img class="adorno cortina" src="/static/decor/cortina_flores.svg" alt="">
+
+  <footer class="footer">
+    <div class="container">
+      <p>VerdES somos — Flora de El Salvador</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/main.js"></script>
+  <script>
+    const id = new URLSearchParams(location.search).get("id");
+    const caja = document.getElementById("ficha");
+    if (!id) {
+      caja.textContent = "Falta el id de la planta.";
+    } else {
+      pedir("/api/plantas/" + id).then((p) => {
+        const fotos = p.fotos.map((src) => `<img src="${src}" alt="">`).join("");
+        caja.innerHTML = `<div class="hero-planta caja">
+          <img src="${p.fotos[0] || ""}" alt="">
+          <div class="cuerpo">
+            <h1>${p.common_name_es || "Sin nombre común"}</h1>
+            <p class="cient">${p.scientific_name}</p>
+            ${etiqueta(p.status)}
+            <p>${p.description || "Sin descripción todavía."}</p>
+            ${p.ecological_impact ? `<p><strong>Impacto.</strong> ${p.ecological_impact}</p>` : ""}
+            ${p.control_methods ? `<p><strong>Qué hacer.</strong> ${p.control_methods}</p>` : ""}
+            <div class="galeria">${fotos}</div>
+          </div>
+        </div>`;
+      }).catch((e) => { caja.textContent = e.message; });
+    }
+  </script>
+</body>
+</html>
